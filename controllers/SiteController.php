@@ -122,4 +122,14 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    /**
+     * Displays preview page.
+     *
+     * @return string
+     */
+    public function actionPreview()
+    {
+        return $this->render('preview');
+    }
 }
