@@ -18,3 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <hr>
 <a href="/img/renault_backend_preview.png" target="_blank" />renault_backend_preview.png</a> <br>
 <a href="/img/renault_backend_preview2.png" target="_blank" />renault_backend_preview2.png</a> <br>
+<hr>
+<?php
+   $str = "Hello world and me!";
+   $mod_str = wordwrap($str,5,"_");
+   echo('<pre>'.$mod_str);
+?>
