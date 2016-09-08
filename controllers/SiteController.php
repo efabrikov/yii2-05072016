@@ -132,4 +132,14 @@ class SiteController extends Controller
     {
         return $this->render('preview');
     }
+
+    /**
+     * Displays promise page.
+     *
+     * @return string
+     */
+    public function actionPromise()
+    {
+        return $this->render('promise');
+    }
 }
