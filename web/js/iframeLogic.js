@@ -9,7 +9,7 @@ function reloadIframe(url) {
         frameborder: "0",
         marginheight: "0",
         marginwidth: "0",
-        style: "background: transparent; width: 100%; height: 800px"
+        style: "background: transparent; width: 100%;"
     }));
 
 }
@@ -33,6 +33,11 @@ function updateIframeEvents() {
     });
 }
 
+function resizeIframe() {
+    var iframe = $('#myIframe', parent.document.body);
+    iframe.height($(document.body).height());
+}
+
 function updatePage(url) {
     console.log("updatePage()");
     var iframeAbsoluteUrl = $("#myIframe").contents().find("#tmpData").attr("data-absoluteUrl");
@@ -43,6 +48,8 @@ function updatePage(url) {
         reloadIframe(url);
         
         updateIframeEvents();
+        
+        resizeIframe();
     }
 }
 
