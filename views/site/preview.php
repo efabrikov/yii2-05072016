@@ -22,5 +22,5 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
    $str = "Hello world and me!";
    $mod_str = wordwrap($str,5,"_");
-   echo('<pre>'.$mod_str);
+   echo('<pre>'.$mod_str);   
 ?>

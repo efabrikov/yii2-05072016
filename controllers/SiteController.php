@@ -75,7 +75,7 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {            
             return $this->goBack();
         }
         return $this->render('login', [
@@ -89,7 +89,7 @@ class SiteController extends Controller
      * @return string
      */
     public function actionLogout()
-    {
+    {        
         Yii::$app->user->logout();
 
         return $this->goHome();
@@ -141,5 +141,25 @@ class SiteController extends Controller
     public function actionPromise()
     {
         return $this->render('promise');
+    }
+
+    /**
+     * Displays fibonacci page.
+     *
+     * @return string
+     */
+    public function actionFibonacci()
+    {
+        return $this->render('fibonacci');
+    }
+
+    /**
+     * Displays iframe page.
+     *
+     * @return string
+     */
+    public function actionIframe()
+    {
+        return $this->render('iframe');
     }
 }
