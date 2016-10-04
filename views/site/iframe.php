@@ -44,6 +44,7 @@ $js = '
 <h2>a target</h2>
 <a href="http://www.mit.edu/" target="myIframeName">» Go to MIT.edu</a>
 <a href="http://www.weather.gov/" target="myIframeName">» Go to Weather.gov</a>
+<a href="http://www.google.com/" target="myIframeName">» Google(error)</a>
 
 <iframe src="http://efabrikov.in.ua/" style="width: 100%;" height="800px;" id="myIframeTest" name="myIframeName" frameborder=0 marginheight=0 marginwidth=0></iframe>
 <script>

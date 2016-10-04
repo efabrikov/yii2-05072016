@@ -7,6 +7,14 @@ use yii\helpers\Html;
 $this->title = 'About';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<hr>
+<a href="http://yii2-05072016/index.php?r=site/preview">preview link</a>
+<hr>
+<?php 
+//header("Location: http://yii2-05072016/index.php?r=site%2Fabout");
+//exit();
+?>
+<hr>
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 

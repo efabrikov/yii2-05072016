@@ -2,6 +2,15 @@ $(document).on("pjax:complete", function (k) {
     //update other pjax block?
 });
 
+/*$("a").click(function() {
+ console.log("click to url: " + $(this).attr("href"));
+ });*/
+
+
+/*$(document).on('click', 'a', function () {
+ console.log("click to url: " + $(this).attr("href"));
+ })*/
+
 function reloadIframe(url) {
     $("#iframeContainer").html($("<iframe/>", {
         id: "myIframe",
@@ -17,18 +26,66 @@ function reloadIframe(url) {
 function updateIframeEvents() {
     $("#myIframe").load(function () {
         var iframeSrc = $(this).attr("src");
-        var iframeAbsoluteUrl = $("#myIframe").contents().find("#tmpData").attr("data-absoluteUrl");
-        var iframeAbsolutePath = iframeAbsoluteUrl.replace("http://", '').replace("http://", '').replace(/.+?\//, '/');
+        var iframe = document.getElementById("myIframe");
+        var iframeReadable = true;
 
-        /*console.log("iframeSrc: " + iframeSrc);
-        console.log("iframeAbsoluteUrl: " + iframeAbsoluteUrl);
-        console.log("iframeAbsolutePath: " + iframeAbsolutePath);*/
-
-        //click on menu after php GET redirect
-        if (iframeSrc != iframeAbsoluteUrl) {
-            console.log("iframe updated, so redirect to new url");
-            $("#mainMenu").find("a[href=\"" + iframeAbsolutePath + "\"]").click();
+        try {
+            var tmpHref = iframe.contentWindow.location.href;
+        } catch (e) {
+            //external domain or other errors
+            iframeReadable = false;
         }
+
+        if (iframeReadable) {
+            console.log("internal url: " + iframe.contentWindow.location.href);
+
+            //click on menu after php GET redirect
+            if (iframeSrc != iframe.contentWindow.location.href) {
+                console.log("iframe updated, so change browser url");
+
+                var menuLink = $("#mainMenu").find("a[href=\""
+                        + iframe.contentWindow.location.pathname
+                        + iframe.contentWindow.location.search
+                        + "\"]")[0];
+
+                if (!menuLink) {                    
+                    menuLink = $("#mainMenu").find("a[href=\""
+                            + iframe.contentWindow.location.pathname
+                            + iframe.contentWindow.location.search.replace(/\//g, "%2F")
+                            + "\"]")[0];
+                }
+
+                if (menuLink) {
+                    menuLink.click();
+                }
+                else {
+                    console.log("can't find menu link");
+                }
+            }
+
+            //when click to external url
+            $(iframe.contentWindow.document).on('click', 'a', function (event) {
+                console.log('click link from iframe: ' + $(this).attr("href"));
+                var linkHost = $(this).attr("href")
+                        .replace("http://", '')
+                        .replace("http://", '')
+                        .replace(/\/.+/, '')
+                        .replace(/\?.+/, '')
+                        .replace(/\#.+/, '')
+                        .replace(/www\./, '');
+
+                if (linkHost && document.location.host != linkHost && !$(this).attr('target')) {
+                    console.log(document.location.host + " != " + linkHost)
+                    console.log('redirect to external url: ' + $(this).attr("href"));
+                    document.location.href = $(this).attr("href");
+                }
+
+            });
+        }
+        else {
+            //console.log("external url");
+        }
+
 
     });
 }
@@ -40,15 +97,23 @@ function resizeIframe() {
 
 function updatePage(url) {
     console.log("updatePage()");
-    var iframeAbsoluteUrl = $("#myIframe").contents().find("#tmpData").attr("data-absoluteUrl");
 
+    var iframe = document.getElementById("myIframe");
+    var iframeHref = (iframe) ? iframe.contentWindow.location.href : '';
+    var fixedIframeHref = (iframeHref) ? iframe.contentWindow.location.origin + iframe.contentWindow.location.pathname + iframe.contentWindow.location.search.replace(/\//g, "%2F") : '';
+
+    //var fixedUrl = iframe.contentWindow.location.pathname + iframe.contentWindow.location.search.replace(/\//g, "%2F");
     //reload iframe if url different
-    if (iframeAbsoluteUrl != url) {
-        console.log("reloadIframe() " + url);
+    if (!iframeHref || (url != iframeHref && url != fixedIframeHref)) {
+        console.log("reloadIframe()");
+
+        console.log("url: " + url);
+        console.log("iframeHref: " + iframeHref);
+
         reloadIframe(url);
-        
-        updateIframeEvents();
-        
+
+        updateIframeEvents(url);
+
         resizeIframe();
     }
 }
@@ -59,8 +124,8 @@ var oldURL = window.location.href;
 function checkURLchange(currentURL) {
     //console.log(Date.now());
     if (currentURL != oldURL) {
-        updatePage(currentURL);
         oldURL = currentURL;
+        updatePage(currentURL);
     }
 }
 

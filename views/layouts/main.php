@@ -1,5 +1,4 @@
 <?php
-
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -25,9 +24,14 @@ AppAsset::register($this);
     <body>
         <?php $this->beginBody() ?>
         <?php
-        /* echo '<br><br><br><br><br>';
+         /*echo '<br><br><br><br><br>';
           echo (Yii::$app->request->referrer) . '<br>';
-          echo (Yii::$app->request->absoluteUrl) . '<br>'; */
+          echo (Yii::$app->request->absoluteUrl) . '<br>';
+          echo yii\helpers\Url::previous('redirectUrl') . '<br>';
+          echo yii\helpers\Url::to(['site/logout'], true) . '<br>';*/
+          
+          //\yii\helpers\VarDumper::dump(Yii::$app->request->status, 10, 1);
+          //print_r(Yii::$app->request);
 
         $msie           = strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE') ? true : false;
         $hideLayoutHtml = false;
@@ -36,12 +40,21 @@ AppAsset::register($this);
             Yii::$app->request->referrer
             //referrer from our site
             and ( preg_replace('$\?.+$', '', Yii::$app->request->referrer) == preg_replace('$\?.+$', '', Yii::$app->request->absoluteUrl))
+            //skip pjax
             and ! Yii::$app->request->isPjax
+            //for ie
             and ! $msie
+            //for site logout redirect 302
+            and yii\helpers\Url::previous('redirectUrl') != yii\helpers\Url::to(['site/logout'], true)
+            //for refresh page
+            and Yii::$app->request->referrer != Yii::$app->request->absoluteUrl
+            
         //or Yii::$app->request->getQueryParam('showLayout')
         //and !empty(Yii::$app->request->getQueryParam('t'))
         ) {
             $hideLayoutHtml = true;
+            
+
             //echo 'да, скрыть!';
             //var_dump(preg_replace('$\?.+$', '', Yii::$app->request->referrer));
             //var_dump(preg_replace('$\?.+$', '',Yii::$app->request->absoluteUrl));
@@ -49,7 +62,10 @@ AppAsset::register($this);
             //var_dump(Yii::$app->getRequest()->getHeaders());
             //var_dump(Yii::$app->request->getQueryParam('t'));
         }
- 
+
+        yii\helpers\Url::remember('unset','redirectUrl');
+
+
         //$this->registerJsFile('/js/iframeLogic.js');
 
         if (empty($hideLayoutHtml)) {
@@ -93,8 +109,7 @@ AppAsset::register($this);
                 <?php Pjax::end(); ?>
 
                 <div class="container" id='iframeContainer' style="">
-<?php } ?>
-                <span id="tmpData" data-absoluteUrl="<?= Yii::$app->request->absoluteUrl; ?>"></span>
+                <?php } ?>
                 <?=
                 Breadcrumbs::widget([
                     'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
@@ -108,13 +123,13 @@ AppAsset::register($this);
                             background: transparent;
                         }
 
-                    </style>
+                    </style>               
                 <?php } ?>
-                    
+
                 <?php
-                /*echo '<br><br><br><br><br>';
-                echo (Yii::$app->request->referrer) . '<br>';
-                echo (Yii::$app->request->absoluteUrl) . '<br>';*/
+                /* echo '<br><br><br><br><br>';
+                  echo (Yii::$app->request->referrer) . '<br>';
+                  echo (Yii::$app->request->absoluteUrl) . '<br>';*/
                 ?>
                 <?= $content ?>
 
@@ -132,11 +147,13 @@ AppAsset::register($this);
                 </div>
             </footer>
             <?php include_once '_background.php'; ?>
-            <?php $this->registerJsFile('/js/iframeLogic.js', [
+            <?php
+            $this->registerJsFile('/js/iframeLogic.js', [
                 'depends' => 'app\assets\AppAsset'
-                ]); ?>
+            ]);
+            ?>
         <?php } ?>
-        <?php $this->endBody() ?>
+<?php $this->endBody() ?>
 
     </body>
 </html>

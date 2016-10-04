@@ -47,6 +47,15 @@ $config = [
         ],
         */
     ],
+    'on afterAction' => function ($event) {
+        /*echo '<br><br><br><br>afterAction';
+        echo Yii::$app->request->referrer;
+        echo Yii::$app->response->statusCode;*/
+        if (302 == Yii::$app->response->statusCode) {
+            yii\helpers\Url::remember(Yii::$app->request->absoluteUrl, 'redirectUrl');
+            //Yii::$app->response->statusCode = 200;
+        }
+    },
     'params' => $params,
 ];
 
