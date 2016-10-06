@@ -7,6 +7,10 @@ use yii\helpers\Html;
 $this->title = 'Preview';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<hr>
+<a href="http://yii2-05072016/index.php?r=site/about">about link</a>
+<hr>
+
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -24,3 +28,4 @@ $this->params['breadcrumbs'][] = $this->title;
    $mod_str = wordwrap($str,5,"_");
    echo('<pre>'.$mod_str);   
 ?>
+

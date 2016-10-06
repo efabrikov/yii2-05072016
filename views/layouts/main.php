@@ -24,22 +24,26 @@ AppAsset::register($this);
     <body>
         <?php $this->beginBody() ?>
         <?php
-         /*echo '<br><br><br><br><br>';
-          echo (Yii::$app->request->referrer) . '<br>';
-          echo (Yii::$app->request->absoluteUrl) . '<br>';
-          echo yii\helpers\Url::previous('redirectUrl') . '<br>';
-          echo yii\helpers\Url::to(['site/logout'], true) . '<br>';*/
-          
-          //\yii\helpers\VarDumper::dump(Yii::$app->request->status, 10, 1);
-          //print_r(Yii::$app->request);
+        /* echo '<br><br><br>';
+          echo 'referrer: ' . (Yii::$app->request->referrer) . '<br>';
+          echo 'absoluteUrl: ' . (Yii::$app->request->absoluteUrl) . '<br>';
+          //echo yii\helpers\Url::previous('redirectUrl') . '<br>';
+          //echo yii\helpers\Url::to(['site/logout'], true) . '<br>';
+          echo 'previous: ' . yii\helpers\Url::previous() . '<br>'; */
 
-        $msie           = strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE') ? true : false;
-        $hideLayoutHtml = false;
+        //$u = 'http://yii2-05072016/index.php?r=site%2Findex&t=1475567110096';
+        //\yii\helpers\VarDumper::dump(Yii::$app->request->status, 10, 1);
+        //print_r(Yii::$app->request);
+
+        $msie             = strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE') ? true : false;
+        $hideLayoutHtml   = false;
+        $referrerNoSearch = preg_replace('$\?.+$', '', Yii::$app->request->referrer);
+        $absUrlNoSearch   = preg_replace('$\?.+$', '', Yii::$app->request->absoluteUrl);
 
         if (//referre exist
             Yii::$app->request->referrer
             //referrer from our site
-            and ( preg_replace('$\?.+$', '', Yii::$app->request->referrer) == preg_replace('$\?.+$', '', Yii::$app->request->absoluteUrl))
+            and ( $referrerNoSearch == $absUrlNoSearch)
             //skip pjax
             and ! Yii::$app->request->isPjax
             //for ie
@@ -47,13 +51,15 @@ AppAsset::register($this);
             //for site logout redirect 302
             and yii\helpers\Url::previous('redirectUrl') != yii\helpers\Url::to(['site/logout'], true)
             //for refresh page
-            and Yii::$app->request->referrer != Yii::$app->request->absoluteUrl
-            
+            //and Yii::$app->request->referrer != Yii::$app->request->absoluteUrl
+            //for refresh after redirect(logout)
+            and yii\helpers\Url::previous() != Yii::$app->request->absoluteUrl
+        //or (Yii::$app->request->get('t') and !Yii::$app->request->isPjax)
         //or Yii::$app->request->getQueryParam('showLayout')
         //and !empty(Yii::$app->request->getQueryParam('t'))
         ) {
             $hideLayoutHtml = true;
-            
+
 
             //echo 'да, скрыть!';
             //var_dump(preg_replace('$\?.+$', '', Yii::$app->request->referrer));
@@ -63,7 +69,10 @@ AppAsset::register($this);
             //var_dump(Yii::$app->request->getQueryParam('t'));
         }
 
-        yii\helpers\Url::remember('unset','redirectUrl');
+        $isFullPage = !$hideLayoutHtml;
+        //$isIframe = Yii::$app->request->get('t');
+
+        yii\helpers\Url::remember('unset', 'redirectUrl');
 
 
         //$this->registerJsFile('/js/iframeLogic.js');
@@ -71,7 +80,7 @@ AppAsset::register($this);
         if (empty($hideLayoutHtml)) {
             ?>
             <div class="wrap">
-                <?php Pjax::begin(); ?>
+                <?php Pjax::begin(['id' => 'mainMenuPjax']); ?>
                 <?php
                 NavBar::begin([
                     'brandLabel' => 'My Company',
@@ -90,7 +99,9 @@ AppAsset::register($this);
                         ['label' => 'Promise', 'url' => ['/site/promise']],
                         ['label' => 'Contact', 'url' => ['/site/contact']],
                         ['label' => 'Fibonacci', 'url' => ['/site/fibonacci']],
+                        //['label' => 'Cookies', 'url' => ['/site/cookies']],
                         ['label' => 'IFrame', 'url' => ['/site/iframe']],
+                        //['label' => 'hidenPjaxLink', 'url' => ['/'] , 'options' => ['style' =>'display:none;', 'id' => 'hidenPjaxLink']],
                         Yii::$app->user->isGuest ? (
                             ['label' => 'Login', 'url' => ['/site/login']]
                             ) : (
@@ -110,31 +121,47 @@ AppAsset::register($this);
 
                 <div class="container" id='iframeContainer' style="">
                 <?php } ?>
-                <?=
-                Breadcrumbs::widget([
-                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
-                            : [],
-                ])
-                ?>
-
-                <?php if ($hideLayoutHtml) { ?>
-                    <style>
-                        body {
-                            background: transparent;
-                        }
-
-                    </style>               
-                <?php } ?>
 
                 <?php
-                /* echo '<br><br><br><br><br>';
-                  echo (Yii::$app->request->referrer) . '<br>';
-                  echo (Yii::$app->request->absoluteUrl) . '<br>';*/
+                if ($isFullPage) {
+                    Pjax::begin(['id' => 'contentPjax']);
+                }
+
+
+                if ('#contentPjax' != Yii::$app->request->get('_pjax')) {
+
+                    /* echo '<br><br><br><br><br>';
+                      echo 'referrer: ' . (Yii::$app->request->referrer) . '<br>';
+                      echo 'absoluteUrl: ' . (Yii::$app->request->absoluteUrl) . '<br>';
+                      echo '_pjax: ' . Yii::$app->request->get('_pjax') . '<br>'; */
+
+                    echo Breadcrumbs::widget([
+                        'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
+                                : [],
+                    ]);
+
+                    echo $content;
+                } else {
+                    $iframeHtml = '<iframe ';
+                    $iframeHtml .= 'src="' . str_replace('&_pjax=%23contentPjax', '', Yii::$app->request->absoluteUrl) . '" ';
+                    $iframeHtml .= 'id="myIframe2" ';
+                    $iframeHtml .= 'style="width:100%; height:500px; background: transparent;" ';
+                    $iframeHtml .= 'frameborder="0" ';
+                    $iframeHtml .= 'marginheight="0" ';
+                    $iframeHtml .= 'marginwidth="0" ';
+                    $iframeHtml .= 'onLoad="processIframeLoad();" ';
+                    $iframeHtml .= '></iframe>';
+
+                    echo $iframeHtml;
+                }
+
+                if ($isFullPage) {
+                    Pjax::end();
+                }
                 ?>
-                <?= $content ?>
 
                 <?php
-                if (empty($hideLayoutHtml)) {
+                if ($isFullPage) {
                     ?>
                 </div>
             </div>
@@ -152,8 +179,27 @@ AppAsset::register($this);
                 'depends' => 'app\assets\AppAsset'
             ]);
             ?>
+
         <?php } ?>
-<?php $this->endBody() ?>
+        <?php
+        if ($hideLayoutHtml) {
+            echo '<style> body { background: transparent; } </style>';
+        }
+        ?>
+
+
+        <?php
+//fix fore back from external domain; t for ff bug cache
+        $absUrl = Yii::$app->request->absoluteUrl;
+
+        if (Yii::$app->request->get('t')) {
+            $search = '&t=' . Yii::$app->request->get('t');
+            $absUrl = str_replace($search, '', $absUrl);
+        }
+
+        yii\helpers\Url::remember($absUrl);
+        ?>
+        <?php $this->endBody() ?>
 
     </body>
 </html>

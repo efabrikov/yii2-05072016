@@ -162,4 +162,14 @@ class SiteController extends Controller
     {
         return $this->render('iframe');
     }
+
+    /**
+     * Displays Cookies page.
+     *
+     * @return string
+     */
+    public function actionCookies()
+    {
+        return $this->render('cookies');
+    }
 }
