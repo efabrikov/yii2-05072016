@@ -29,7 +29,8 @@ AppAsset::register($this);
           echo 'absoluteUrl: ' . (Yii::$app->request->absoluteUrl) . '<br>';
           //echo yii\helpers\Url::previous('redirectUrl') . '<br>';
           //echo yii\helpers\Url::to(['site/logout'], true) . '<br>';
-          echo 'previous: ' . yii\helpers\Url::previous() . '<br>'; */
+          echo 'previous: ' . yii\helpers\Url::previous() . '<br>';
+          echo 'previous statusCode: ' . yii\helpers\Url::previous('statusCode') . '<br>'; */
 
         //$u = 'http://yii2-05072016/index.php?r=site%2Findex&t=1475567110096';
         //\yii\helpers\VarDumper::dump(Yii::$app->request->status, 10, 1);
@@ -48,12 +49,15 @@ AppAsset::register($this);
             and ! Yii::$app->request->isPjax
             //for ie
             and ! $msie
-            //for site logout redirect 302
-            and yii\helpers\Url::previous('redirectUrl') != yii\helpers\Url::to(['site/logout'], true)
-            //for refresh page
-            //and Yii::$app->request->referrer != Yii::$app->request->absoluteUrl
-            //for refresh after redirect(logout)
-            and yii\helpers\Url::previous() != Yii::$app->request->absoluteUrl
+        //for site logout redirect 302
+        //and yii\helpers\Url::previous('redirectUrl') != yii\helpers\Url::to(['site/logout'], true)
+        //for site login redirect 302
+        //and yii\helpers\Url::previous('redirectUrl') != yii\helpers\Url::to(['site/login'], true)
+        //for refresh page
+        //and Yii::$app->request->referrer != Yii::$app->request->absoluteUrl
+        //for refresh after redirect(logout) and pjax refresh(contact->contact)
+        //and (yii\helpers\Url::previous() != Yii::$app->request->absoluteUrl or 302 == yii\helpers\Url::previous('statusCode'))
+        //and (Yii::$app->request->referrer and 302 == yii\helpers\Url::previous('statusCode'))
         //or (Yii::$app->request->get('t') and !Yii::$app->request->isPjax)
         //or Yii::$app->request->getQueryParam('showLayout')
         //and !empty(Yii::$app->request->getQueryParam('t'))
@@ -99,14 +103,14 @@ AppAsset::register($this);
                         ['label' => 'Promise', 'url' => ['/site/promise']],
                         ['label' => 'Contact', 'url' => ['/site/contact']],
                         ['label' => 'Fibonacci', 'url' => ['/site/fibonacci']],
-                        //['label' => 'Cookies', 'url' => ['/site/cookies']],
+                        ['label' => 'Cookies', 'url' => ['/site/cookies']],
                         ['label' => 'IFrame', 'url' => ['/site/iframe']],
-                        //['label' => 'hidenPjaxLink', 'url' => ['/'] , 'options' => ['style' =>'display:none;', 'id' => 'hidenPjaxLink']],
+                        ['label' => 'Pjax', 'url' => ['/site/pjax']],
                         Yii::$app->user->isGuest ? (
                             ['label' => 'Login', 'url' => ['/site/login']]
                             ) : (
                             '<li>'
-                            . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
+                            . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form', 'data-pjax' => true])
                             . Html::submitButton(
                                 'Logout (' . Yii::$app->user->identity->username . ')', ['class' => 'btn btn-link']
                             )
@@ -119,51 +123,63 @@ AppAsset::register($this);
                 ?>
                 <?php Pjax::end(); ?>
 
-                <div class="container" id='iframeContainer' style="">
-                <?php } ?>
+            <?php } ?>
 
-                <?php
-                if ($isFullPage) {
-                    Pjax::begin(['id' => 'contentPjax']);
-                }
+            <?php
+            if ($isFullPage) {
+                Pjax::begin(['id'      => 'contentPjax',
+                    'options' => [
+                        'class' => 'container'
+                    ]
+                /* , 'clientOptions' => [
+                  'pushRedirect' => true,
+                  'replaceRedirect' => false
+                  ] */                ]);
+            }
 
 
-                if ('#contentPjax' != Yii::$app->request->get('_pjax')) {
+            if ('#contentPjax' != Yii::$app->request->get('_pjax')) {
 
-                    /* echo '<br><br><br><br><br>';
-                      echo 'referrer: ' . (Yii::$app->request->referrer) . '<br>';
-                      echo 'absoluteUrl: ' . (Yii::$app->request->absoluteUrl) . '<br>';
-                      echo '_pjax: ' . Yii::$app->request->get('_pjax') . '<br>'; */
+                /* echo '<br><br><br><br><br>';
+                  echo 'referrer: ' . (Yii::$app->request->referrer) . '<br>';
+                  echo 'absoluteUrl: ' . (Yii::$app->request->absoluteUrl) . '<br>';
+                  echo '_pjax: ' . Yii::$app->request->get('_pjax') . '<br>'; */
 
-                    echo Breadcrumbs::widget([
-                        'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
-                                : [],
-                    ]);
+                echo Breadcrumbs::widget([
+                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
+                            : [],
+                ]);
 
-                    echo $content;
-                } else {
-                    $iframeHtml = '<iframe ';
-                    $iframeHtml .= 'src="' . str_replace('&_pjax=%23contentPjax', '', Yii::$app->request->absoluteUrl) . '" ';
-                    $iframeHtml .= 'id="myIframe2" ';
-                    $iframeHtml .= 'style="width:100%; height:500px; background: transparent;" ';
-                    $iframeHtml .= 'frameborder="0" ';
-                    $iframeHtml .= 'marginheight="0" ';
-                    $iframeHtml .= 'marginwidth="0" ';
-                    $iframeHtml .= 'onLoad="processIframeLoad();" ';
-                    $iframeHtml .= '></iframe>';
+                echo $content;
+            } else {
 
-                    echo $iframeHtml;
-                }
+                $iframeSrc = Yii::$app->request->absoluteUrl;
+                $iframeSrc = str_replace('&_pjax=%23contentPjax', '', $iframeSrc);
+                $iframeSrc = str_replace('?_pjax=%23contentPjax', '', $iframeSrc);
 
-                if ($isFullPage) {
-                    Pjax::end();
-                }
+                $iframeHtml = '<iframe ';
+                $iframeHtml .= 'src="' . $iframeSrc . '" ';
+                $iframeHtml .= 'id="myIframe2" ';
+                $iframeHtml .= 'style="width:100%; height:100%; background: transparent; display:none; overflow: hidden;" ';
+                $iframeHtml .= 'frameborder="0" ';
+                $iframeHtml .= 'marginheight="0" ';
+                $iframeHtml .= 'marginwidth="0" ';
+                $iframeHtml .= 'hspace="0" ';
+                $iframeHtml .= 'vspace="0" ';
+                $iframeHtml .= 'onLoad="parent.processIframeLoad();" ';
+                $iframeHtml .= '></iframe>';
+
+                echo $iframeHtml;
+            }
+
+            if ($isFullPage) {
+                Pjax::end();
+            }
+            ?>
+
+            <?php
+            if ($isFullPage) {
                 ?>
-
-                <?php
-                if ($isFullPage) {
-                    ?>
-                </div>
             </div>
 
             <footer class="footer">
@@ -184,12 +200,13 @@ AppAsset::register($this);
         <?php
         if ($hideLayoutHtml) {
             echo '<style> body { background: transparent; } </style>';
+            echo '<style> body{overflow: hidden;} </style>';
         }
         ?>
-
+       
 
         <?php
-//fix fore back from external domain; t for ff bug cache
+        //fix fore back from external domain; t for ff bug cache
         $absUrl = Yii::$app->request->absoluteUrl;
 
         if (Yii::$app->request->get('t')) {
@@ -198,6 +215,7 @@ AppAsset::register($this);
         }
 
         yii\helpers\Url::remember($absUrl);
+        yii\helpers\Url::remember(200, 'statusCode');
         ?>
         <?php $this->endBody() ?>
 

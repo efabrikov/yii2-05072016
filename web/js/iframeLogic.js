@@ -1,10 +1,24 @@
 //for pjax main menu
-$(document).on("pjax:complete", function (k) {
+$(document).on("pjax:complete", function (k) {    
     //console.dir(k.target.id);
-    if ('mainMenuPjax' == k.target.id && isIframeReloaded()) {
+    var iframe = document.getElementById("myIframe2");
+    var isMainMenuEvent =  ('mainMenuPjax' == k.target.id)? true : false;
+    
+    //menu click event on first load
+    if (isMainMenuEvent && !iframe) {
         //console.log("reload #contentPjax");
         $.pjax.reload('#contentPjax');
     }
+    
+    //menu click event after iframe reloaded
+    if (isMainMenuEvent && iframe && isIframeReadable(iframe) && isIframeReloaded(iframe)) {
+        //console.log("reload #contentPjax");
+        $.pjax.reload('#contentPjax');
+    }
+    
+    //alert(isIframeReloaded());
+    
+
 });
 
 //onLoad iframe event
@@ -96,29 +110,44 @@ function bindIframeEvents(iframe) {
 function resizeIframe(iframe) {
     console.log("resizeIframe()");
     var iframe2 = $('#myIframe2', parent.document.body);
-    iframe2.height($(document.body).height());
+    
+    console.log('iframe width: ' + iframe2.width());
+    console.log('iframe height: ' + iframe2.height());
+    console.log('iframe parent width: ' + iframe2.parent().width());
+    
+    iframe2.height($(document.body).height());    
+    //fix for iframe reload.
+    $('#contentPjax').css('min-height', $(document.body).height() + 'px');
+    //slideDown,show scroll
+    iframe2.slideDown('slow', function() {
+        iframe2.css('overflow','scroll');
+        iframe2.contents().find('body').css('overflow', 'auto');
+    });
+    
+    
 }
 
 
-function isIframeReloaded() {
-    var iframe = document.getElementById("myIframe2");
-
-    if (iframe) {
-        var iframeReadable = true;
-
-        try {
-            var tmpHref = iframe.contentWindow.location.href;
-        } catch (e) {
-            //external domain or other errors
-            iframeReadable = false;
-        }
-
-        if (iframeReadable) {
-            if (location.href != iframe.contentWindow.location.href && location.href.replace('%2F', '/') != iframe.contentWindow.location.href) {
-                //console.log(location.href + ' != ' + iframe.contentWindow.location.href);
-                return true;
-            }
-
-        }
+function isIframeReloaded(iframe) {
+    if (location.href != iframe.contentWindow.location.href && location.href.replace('%2F', '/') != iframe.contentWindow.location.href) {
+        //console.log(location.href + ' != ' + iframe.contentWindow.location.href);
+        return true;
     }
+
+    return false;
+
+}
+
+function isIframeReadable(iframe) {
+
+    var iframeReadable = true;
+
+    try {
+        var tmpHref = iframe.contentWindow.location.href;
+    } catch (e) {
+        //external domain or other errors
+        iframeReadable = false;
+    }
+    
+    return iframeReadable;
 }

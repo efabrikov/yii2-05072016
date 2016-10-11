@@ -15,22 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <a href="<?= yii\helpers\Url::to(['/site/cookies']) ?>">cookies link</a>
 <hr>
 
-<h3>Pjax time form</h3>
-<?php Pjax::begin(['id'=>'aboutTimeForm', 'clientOptions' => ['skipOuterContainers' => true]]); ?>
-<form action="" data-pjax>
-    <?php echo time(); ?>
-    <input type="submit">
-</form>
-<?php Pjax::end(); ?>
-<hr>
-
-<h3>Pjax get block</h3>
-<?php Pjax::begin(['id'=>'aboutPjaxGetBlock', 'enablePushState' => false, 'clientOptions' => ['skipOuterContainers' => true]]); ?>
-<?php echo time(); ?>
-<a href=""> reload</a>
-<?php Pjax::end(); ?>
-<hr>
-
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 
