@@ -36,5 +36,5 @@ function createGreeter($who)
 $greeter = createGreeter("World");
 $greeter();
 ?>
-
+hello // world
 <hr>

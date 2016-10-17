@@ -20,8 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
     
 </div>
 <hr>
-<a href="/img/renault_backend_preview.png" target="_blank" />renault_backend_preview.png</a> <br>
-<a href="/img/renault_backend_preview2.png" target="_blank" />renault_backend_preview2.png</a> <br>
+<a href="/img/renault_backend_preview.png" target="_blank" >renault_backend_preview.png</a> <br>
+<a href="/img/renault_backend_preview2.png" target="_blank" >renault_backend_preview2.png</a> <br>
 <hr>
 <?php
    $str = "Hello world and me!";

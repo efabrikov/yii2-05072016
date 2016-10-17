@@ -195,4 +195,18 @@ class SiteController extends Controller
                 'msg' => $msg
         ]);
     }
+
+    /**
+     * Displays Curl page.
+     *
+     * @return string
+     */
+    public function actionCurl()
+    {
+        $msg = '';
+
+        return $this->render('curl', [
+                'msg' => $msg
+        ]);
+    }
 }

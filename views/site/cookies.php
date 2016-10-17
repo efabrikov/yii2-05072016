@@ -17,3 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <hr>
 
+<?php
+//\yii\helpers\VarDumper::dump( Yii::$app->session, 11, 1);
+\yii\helpers\VarDumper::dump(Yii::$app->session->hasFlash('contactFormSubmitted'), 11, 1); ;
+    ?>
+
