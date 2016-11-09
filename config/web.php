@@ -74,7 +74,7 @@ $config = [
             //$htmlPart = escapeJavaScriptText2(($html->find($id, 0)->innertext));
             return '$("' . $id . '").html(' . trim($htmlPart) . ');' . PHP_EOL;
         }
-        $data = '';
+        $data   = '';
         $data .= '<script>$ = window.parent.$; jQuery = window.parent.jQuery; yii = window.parent.yii;' . PHP_EOL;
         $data .= '$(document).ready(function(){ console.log("run iframe scripts");' . PHP_EOL;
 
@@ -85,38 +85,36 @@ $config = [
         }
 
         //$data .= getHtmlBlock('#endBodyPjax', $htmlDom);
-
         //add new scripts
-        $new = print_r(Yii::$app->session->get('jsFilesLog') , 1);
-        $old = print_r(Yii::$app->session->get('jsFilesLogPrev') , 1);
+        $new  = print_r(Yii::$app->session->get('jsFilesLog'), 1);
+        $old  = print_r(Yii::$app->session->get('jsFilesLogPrev'), 1);
         $diff = [];
         foreach (Yii::$app->session->get('jsFilesLog') as $key => $value) {
             //echo Yii::$app->session->get('jsFilesLogPrev')[$key]; die();
             if (empty(Yii::$app->session->get('jsFilesLogPrev')[$key])) {
                 $diff[] = $key;
             }
-        }       
-        
-        /*foreach ($diff as $key => $value) {
-            $data .= '$("body").append("<script>'
-            . 'console.log(\"added script: '.$value.' \"); ' . PHP_EOL
-            . htmlentities(file_get_contents(Yii::getAlias('@webroot') .  $value)) . ' '
-            . '<\/script>");';
-        }*/
+        }
+
+        /* foreach ($diff as $key => $value) {
+          $data .= '$("body").append("<script>'
+          . 'console.log(\"added script: '.$value.' \"); ' . PHP_EOL
+          . htmlentities(file_get_contents(Yii::getAlias('@webroot') .  $value)) . ' '
+          . '<\/script>");';
+          } */
 
         foreach ($diff as $key => $value) {
-            $data .= file_get_contents(Yii::getAlias('@webroot') .  $value);
-            
+            $data .= file_get_contents(Yii::getAlias('@webroot') . $value);
         }
 
         if (YII_ENV_DEV) {
-        \yii\helpers\VarDumper::dump($new, 11, 1);
-        \yii\helpers\VarDumper::dump($old, 11, 1);
-        \yii\helpers\VarDumper::dump($diff, 11, 1);
+            \yii\helpers\VarDumper::dump($new, 11, 1);
+            \yii\helpers\VarDumper::dump($old, 11, 1);
+            \yii\helpers\VarDumper::dump($diff, 11, 1);
         }
         //$data .= $new;
 //die();
-        
+
 
         $data .= '});</script>';
 
@@ -137,11 +135,12 @@ $config = [
     if (Yii::$app->session->get('jsFilesLog') and ! Yii::$app->request->isAjax and
         ! Yii::$app->request->isPjax) {
         //echo '<script>alert("s")</script>';
-
-        Yii::$app->response->data .= '<hr>jsFilesLog<hr>';
-        Yii::$app->response->data .= \yii\helpers\VarDumper::dumpAsString(Yii::$app->session->get('jsFilesLog'), 11, 1);
-        Yii::$app->response->data .= '<hr>jsFilesLogPrev<hr>';
-        Yii::$app->response->data .= \yii\helpers\VarDumper::dumpAsString(Yii::$app->session->get('jsFilesLogPrev'), 11, 1);
+        if (YII_ENV_DEV) {
+            Yii::$app->response->data .= '<hr>jsFilesLog<hr>';
+            Yii::$app->response->data .= \yii\helpers\VarDumper::dumpAsString(Yii::$app->session->get('jsFilesLog'), 11, 1);
+            Yii::$app->response->data .= '<hr>jsFilesLogPrev<hr>';
+            Yii::$app->response->data .= \yii\helpers\VarDumper::dumpAsString(Yii::$app->session->get('jsFilesLogPrev'), 11, 1);
+        }
     }
     /*
       if (Yii::$app->session->get('jsLog') and !Yii::$app->request->isAjax and !Yii::$app->request->isPjax) {
