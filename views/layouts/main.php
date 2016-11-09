@@ -8,9 +8,6 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use \yii\widgets\Pjax;
-use linslin\yii2\curl;
-use Sunra\PhpSimple\HtmlDomParser;
-use yii\helpers\Url;
 
 AppAsset::register($this);
 ?>
@@ -20,62 +17,39 @@ AppAsset::register($this);
     <head>
         <meta charset="<?= Yii::$app->charset ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
+
         <?php $this->head() ?>
+        <?php include_once '_background.php'; ?>
+
     </head>
     <body>
+        <?php Pjax::begin(['id' => 'beginBodyPjax']); ?>
         <?php $this->beginBody() ?>
+        <?php Pjax::end(); ?>
+
+        <?php
+        /* echo '<br><br><br><pre>';
+          echo @Yii::$app->session->id;
+          echo '<hr>';
+          print_r(Yii::$app->request->cookies);
+          echo '</pre><hr>'; */
+        ?>
 
         <div class="wrap">
-            
-            <?php Pjax::begin(['id' => 'mainMenuPjax']); ?>
+
             <?php
+            Pjax::begin(['id' => 'mainMenuPjax']);
 
             if (Yii::$app->request->isPjax
                 and '#mainMenuPjax' == Yii::$app->request->getHeaders()['X-PJAX-Container']) {
-
-                $absUrl = str_replace('&_pjax=%23contentPjax', '', str_replace('?_pjax=%23contentPjax', '', Yii::$app->request->absoluteUrl));
-
-                //Init curl
-                $curl = new curl\Curl();
-
-                $curl->setOption(CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-
-                if ($_COOKIE) {
-                    $cookies = null;
-
-                    foreach ($_COOKIE as $key => $value) {
-                        $cookies[] = $key . '=' . $value;
-                    }
-
-                    $cookies = implode('; ', $cookies);
-                    
-                    //$curl->setOption(CURLOPT_COOKIE, $cookies);
-                }           
-
-                $response = $curl->get($absUrl);
-                $htmlDom  = HtmlDomParser::str_get_html(preg_replace(
-                            //delete single line comments
-                            '@[\s]+//.+@', '', $response
-                ));
-
-                function includeHtmlBlock($id, &$htmlDom, &$view)
-                {
-                    $htmlPart = json_encode($htmlDom->find($id, 0)->innertext);
-
-                    //$htmlPart = escapeJavaScriptText2(($html->find($id, 0)->innertext));
-
-                    $js = 'jQuery(document).ready(function(){'
-                        . '$("' . $id . '").html(' . $htmlPart . ');'
-                        . '});';
-
-                    $view->registerJs($js);
-                }
-                includeHtmlBlock('#contentPjax', $htmlDom, $this);
-                includeHtmlBlock('#assetsPjax', $htmlDom, $this);
+                //$js = '$.pjax.efabrikov.queue = [ "beginBodyPjax", "contentPjax", "endBodyPjax"]';
+                //$this->registerJs($js);
             }
             ?>
+
             <?php
             NavBar::begin([
                 'brandLabel' => 'My Company',
@@ -122,12 +96,7 @@ AppAsset::register($this);
                 'options' => [
                     'class' => 'container'
                 ]
-            /* , 'clientOptions' => [
-              'pushRedirect' => true,
-              'replaceRedirect' => false
-              ] */            ]);
-
-
+            ]);
 
             echo Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
@@ -138,7 +107,8 @@ AppAsset::register($this);
 
             Pjax::end();
             ?>
-        </div>
+        </div>       
+
 
         <footer class="footer">
             <div class="container">
@@ -146,22 +116,40 @@ AppAsset::register($this);
 
                 <p class="pull-right"><?= Yii::powered() ?></p>
             </div>
-        </footer>
+        </footer>        
 
-        <?php include_once '_background.php'; ?>
+        <span style="display:block;" id = "dataIframeContainer"></span>
 
-        <style> body { background: transparent; } </style>
-
-        <?php Pjax::begin(['id' => 'assetsPjax']); ?>
-        <?php
-        if (Yii::$app->request->isPjax
-            and '#assetsPjax' == Yii::$app->request->getHeaders()['X-PJAX-Container']) {
-
-        }
-        ?>
+        <?php Pjax::begin(['id' => 'endBodyPjax']); ?>
 
         <?php $this->endBody() ?>
+
         <?php Pjax::end(); ?>
+
+        <?php
+        if (Yii::$app->session->get('jsFilesLog')) {
+            Yii::$app->session->set(
+                'jsFilesLogPrev', yii\helpers\ArrayHelper::merge(
+                    Yii::$app->session->get('jsFilesLogPrev'), Yii::$app->session->get('jsFilesLog')
+                )
+            );
+            //Yii::$app->session->set('jsFilesLogPrev', Yii::$app->session->get('jsFilesLog'));
+        }
+
+        //TODO: why 3?
+        Yii::$app->session->set('jsFilesLog', $this->jsFiles[3]);
+        ?>
+
+        <?php
+        if (Yii::$app->session->get('jsLog')) {
+            Yii::$app->session->set('jsLogPrev', Yii::$app->session->get('jsLog'));
+        }
+
+        Yii::$app->session->set('jsLog', $this->js);
+        ?>
+
+
+
     </body>
 </html>
 <?php $this->endPage() ?>

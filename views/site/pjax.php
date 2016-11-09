@@ -10,12 +10,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <?php
-$js = '$("#contentPjax a").unbind("click"); $("#contentPjax a").unbind("pjax:click");console.log("unbind pjax click");';
+//$js = '$("#contentPjax a").unbind("click"); $("#contentPjax a").unbind("pjax:click");console.log("unbind pjax click");';
 //$this->registerJs($js);
 ?>
 
 <h3>Pjax time form</h3>
-<?php Pjax::begin(['id'=>'aboutTimeForm', 'clientOptions' => ['skipOuterContainers' => true]]); ?>
+<?php Pjax::begin(['id'=>'aboutTimeForm', 'enablePushState' => false, 'clientOptions' => ['skipOuterContainers' => true]]); ?>
 <form action="<?= Url::to(''); ?>" data-pjax="1">
     <?php echo time(); ?>
     <input type="submit">
