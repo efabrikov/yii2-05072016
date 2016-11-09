@@ -109,9 +109,11 @@ $config = [
             
         }
 
+        if (YII_ENV_DEV) {
         \yii\helpers\VarDumper::dump($new, 11, 1);
         \yii\helpers\VarDumper::dump($old, 11, 1);
-        \yii\helpers\VarDumper::dump($diff, 11, 1);        
+        \yii\helpers\VarDumper::dump($diff, 11, 1);
+        }
         //$data .= $new;
 //die();
         
