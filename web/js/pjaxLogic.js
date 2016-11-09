@@ -27,7 +27,7 @@ $(document).on("pjax:complete", function (k) {
     
     $("#dataIframeContainer").html($("<iframe/>", {
          id: "dataIframe",
-         style: "width:700px; height:500px;",         
+         style: "width:700px; height:500px; display:none;",         
          src: src,  
      }));    
 
