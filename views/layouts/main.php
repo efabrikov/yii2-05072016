@@ -26,7 +26,7 @@ AppAsset::register($this);
 
     </head>
     <body>
-        <?php Pjax::begin(['id' => 'beginBodyPjax']); ?>
+        <?php Pjax::begin(['id' => 'beginBodyPjax']); ?>        
         <?php $this->beginBody() ?>
         <?php Pjax::end(); ?>
 
@@ -41,12 +41,13 @@ AppAsset::register($this);
         <div class="wrap">
 
             <?php
+            
             Pjax::begin(['id' => 'mainMenuPjax']);
-
+            Yii::$app->session->set('t1', Yii::$app->getView()->js);             
             if (Yii::$app->request->isPjax
                 and '#mainMenuPjax' == Yii::$app->request->getHeaders()['X-PJAX-Container']) {
-                //$js = '$.pjax.efabrikov.queue = [ "beginBodyPjax", "contentPjax", "endBodyPjax"]';
-                //$this->registerJs($js);
+                $js = '$.pjax.efabrikov.queue = ["contentPjax"]';
+                $this->registerJs($js);
             }
             ?>
 
@@ -87,11 +88,13 @@ AppAsset::register($this);
             ]);
             NavBar::end();
             ?>
+            <?php Yii::$app->session->set('t2', Yii::$app->getView()->js); ?>
             <?php Pjax::end(); ?>
+            
 
 
 
-            <?php
+            <?php            
             Pjax::begin(['id'      => 'contentPjax',
                 'options' => [
                     'class' => 'container'
@@ -119,36 +122,12 @@ AppAsset::register($this);
         </footer>        
 
         <span style="display:block;" id = "dataIframeContainer"></span>
-
+        
         <?php Pjax::begin(['id' => 'endBodyPjax']); ?>
 
-        <?php $this->endBody() ?>
+        <?php $this->endBody() ?>        
 
         <?php Pjax::end(); ?>
-
-        <?php
-        if (Yii::$app->session->get('jsFilesLog')) {
-            Yii::$app->session->set(
-                'jsFilesLogPrev', yii\helpers\ArrayHelper::merge(
-                    Yii::$app->session->get('jsFilesLogPrev'), Yii::$app->session->get('jsFilesLog')
-                )
-            );
-            //Yii::$app->session->set('jsFilesLogPrev', Yii::$app->session->get('jsFilesLog'));
-        }
-
-        //TODO: why 3?
-        Yii::$app->session->set('jsFilesLog', $this->jsFiles[3]);
-        ?>
-
-        <?php
-        if (Yii::$app->session->get('jsLog')) {
-            Yii::$app->session->set('jsLogPrev', Yii::$app->session->get('jsLog'));
-        }
-
-        Yii::$app->session->set('jsLog', $this->js);
-        ?>
-
-
 
     </body>
 </html>

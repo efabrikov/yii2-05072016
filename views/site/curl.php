@@ -40,3 +40,9 @@ function includeHtmlBlock($id, &$htmlDom, &$view)
 //includeHtmlBlock('#assetsPjax', $htmlDom, $this);
 ?>
 <hr>
+<?php
+$curl                          = new curl\Curl();
+$response                      = $curl->get(Url::to(['site/contact'], true));
+echo htmlentities($response);
+?>
+
