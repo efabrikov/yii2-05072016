@@ -52,10 +52,10 @@ $this->title = 'My Yii Application';
     </div>
 </div>
 <?php 
-//yii\helpers\VarDumper::dump( Yii::$app->session->get('t'), 10, 1);
+yii\helpers\VarDumper::dump( Yii::$app->session->get('t'), 10, 1);
 //print_r(Yii::$app->session);
 echo '<hr>';
-//yii\helpers\VarDumper::dump( Yii::$app->session->get('t2'), 10, 1);
+yii\helpers\VarDumper::dump( Yii::$app->session->get('t2'), 10, 1);
 //print_r(Yii::$app->session);
 echo '<hr>';
 //yii\helpers\VarDumper::dump( Yii::$app->session->get('h'), 10, 1);

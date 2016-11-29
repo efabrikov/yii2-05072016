@@ -67,3 +67,6 @@ $this->registerMetaTag(['name' => 'description', 'content' => 'This website is a
 
     <?php endif; ?>
 </div>
+<?php 
+$this->registerJsFile('/js/t1.js');
+?>
