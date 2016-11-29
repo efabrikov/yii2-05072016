@@ -202,11 +202,9 @@ class SiteController extends Controller
      * @return string
      */
     public function actionCurl()
-    {
-        $msg = '';
+    {           
+        \Yii::$app->view->params['isUserSaved'] = true ;        
 
-        return $this->render('curl', [
-                'msg' => $msg
-        ]);
+        return $this->render('curl');
     }
 }

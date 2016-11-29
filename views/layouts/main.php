@@ -26,25 +26,24 @@ AppAsset::register($this);
     <body>        
         <?php $this->beginBody() ?>        
 
+        <?php
+        if (!empty($this->params['msg'])) {
+            echo '<script>console.log("' . $this->params['msg'] . '");</script>';
+        }
+        ?> 
         <div class="wrap">
 
             <?php include_once '_topMenu.php'; ?>
 
-            <?php            
-            Pjax::begin(['id'      => 'contentPjax',
+            <?php
+            Pjax::begin(['id' => 'contentPjax',
                 'options' => [
                     'class' => 'container'
                 ]
             ]);
-            
-            if (Yii::$app->request->isPjax
-                and '#contentPjax' == Yii::$app->request->getHeaders()['X-PJAX-Container']) {
-                Yii::$app->session->set('t2', Yii::$app->request->referrer . ' =? ' . Yii::$app->request->absoluteUrl);             
-            }
 
             echo Breadcrumbs::widget([
-                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
-                        : [],
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]);
 
             echo $content;
@@ -53,9 +52,12 @@ AppAsset::register($this);
             ?>
         </div>       
 
+        <?php Pjax::begin(['id' => 'userInfoPjax']); ?>
+        some user data example. t = <?php echo time(); ?>
+        <?php Pjax::end(); ?>
 
         <?php include_once '_bottomMenu.php'; ?>
-        
+
         <footer class="footer">
             <div class="container">
                 <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
@@ -66,7 +68,7 @@ AppAsset::register($this);
 
         <span style="display:block;" id = "dataIframeContainer"></span>                
 
-        <?php $this->endBody() ?>        
+<?php $this->endBody() ?>        
 
     </body>
 </html>

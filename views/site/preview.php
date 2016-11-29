@@ -10,6 +10,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <hr>
 <a href="http://yii2-05072016/index.php?r=site/about">about link</a>
 <hr>
+<hr>
+<a href="<?= yii\helpers\Url::to(['/site/curl']) ?>">curl link</a>
+<hr>
 
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>

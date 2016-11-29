@@ -8,15 +8,7 @@ use \yii\widgets\Pjax;
 
 Pjax::begin(['id' => 'mainMenuPjax']);
 
-if (Yii::$app->request->isPjax and '#mainMenuPjax' == Yii::$app->request->getHeaders()['X-PJAX-Container'] and ! Yii::$app->request->get('isPjaxReload')) {      
-    $reloadQueue = [];
-    $reloadQueue[] = 'contentPjax';
-    $reloadQueue[] = 'bottomMenuPjax';
-    
-    if ($reloadQueue) {
-        echo '<script>$.pjax.efabrikov.queue = ["' . implode('", "', $reloadQueue) . '"];</script>';        
-    }   
-}
+
 ?>
 
 <?php
